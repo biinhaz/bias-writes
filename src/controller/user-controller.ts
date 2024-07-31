@@ -54,6 +54,13 @@ export async function loginUserHandler(request: FastifyRequest, reply: FastifyRe
 
     const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: "1h" })
 
+    reply.setCookie('auth_token', token, {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+    })
+
     return ({
         userId: user.id,
         email: user.email,

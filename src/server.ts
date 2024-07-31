@@ -4,8 +4,14 @@ import { validatorCompiler, serializerCompiler } from "fastify-type-provider-zod
 import { userRoutes } from "./view/user-routes";
 import dotenv from 'dotenv';
 import { postsRoutes } from "./view/posts-routes";
+import fastifyCookie from "@fastify/cookie";
 
 const app = fastify()
+
+app.register(fastifyCookie, {
+    secret: process.env.SECRET_COOKIE || 'supersecret',
+    parseOptions: {}
+    });
 
 dotenv.config();
 
