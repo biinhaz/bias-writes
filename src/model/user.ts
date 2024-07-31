@@ -11,5 +11,6 @@ export async function createUser(data: Omit<User, 'id'>) {
     const user = await prisma.user.create({
         data
     });
+    
     return user;
 }

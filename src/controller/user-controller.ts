@@ -1,6 +1,8 @@
 import { FastifyRequest } from "fastify";
 import { z } from "zod";
 import { createUser } from "../model/user";
+import { hash } from "bcrypt";
+import { Hash } from "crypto";
 
 const createUserSchema = z.object({
     name: z.string(),
@@ -11,7 +13,15 @@ const createUserSchema = z.object({
 export async function createUserHandler(request: FastifyRequest) {
     const { name, email, password } = createUserSchema.parse(request.body);
 
-    const user = await createUser({ name, email, password });
+    const passwordHash = await hash(password, 8)
 
-    return ({ userId: user.id });
+    const user = await createUser({ name, email, password: passwordHash });
+
+    return ({ 
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        createdAt: user.createdAt
+    });
 }
