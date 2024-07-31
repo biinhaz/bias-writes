@@ -1,14 +1,19 @@
-import { FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { createUser } from "../model/user";
+import { createUser, loginUser } from "../model/user";
 import { hash } from "bcrypt";
-import { Hash } from "crypto";
+import jwt from "jsonwebtoken";
 
 const createUserSchema = z.object({
     name: z.string(),
     email: z.string().email(),
     password: z.string().min(5),
 });
+
+const loginUserSchema = z.object({
+    email: z.string(),
+    password: z.string().min(5)
+})
 
 export async function createUserHandler(request: FastifyRequest) {
     const { name, email, password } = createUserSchema.parse(request.body);
@@ -24,4 +29,34 @@ export async function createUserHandler(request: FastifyRequest) {
         password: user.password,
         createdAt: user.createdAt
     });
+}
+
+export async function loginUserHandler(request: FastifyRequest, reply: FastifyReply) {
+    const { email, password } = loginUserSchema.parse(request.body)
+
+    const { user, passwordMatches } = await loginUser(email, password)
+
+    if (!user) {
+        reply.status(401).send({ error: "User not found." })
+        return
+    }
+
+    if (!passwordMatches) {
+        reply.status(401).send({ error: "Password incorrect." })
+        return
+    }
+
+    const secretKey = process.env.JWT_SECRET_KEY
+    if (!secretKey) {
+        reply.status(500).send({ error: "Server configuration error." });
+        return;
+    }
+
+    const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: "1h" })
+
+    return ({
+        userId: user.id,
+        email: user.email,
+        token
+    })
 }

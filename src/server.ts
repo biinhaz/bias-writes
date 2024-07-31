@@ -2,8 +2,11 @@ import fastify from "fastify";
 import cors from "@fastify/cors";
 import { validatorCompiler, serializerCompiler } from "fastify-type-provider-zod";
 import { userRoutes } from "./view/user-routes";
+import dotenv from 'dotenv';
 
 const app = fastify()
+
+dotenv.config();
 
 app.register(cors, {
     origin: '*',
