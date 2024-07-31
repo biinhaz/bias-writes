@@ -1,18 +1,24 @@
-import { FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 import { createPost } from "../model/posts";
 
 const createPostsSchema = z.object({
     title: z.string(),
     description: z.string(),
-    user_id: z.string()
 })
 
-export async function createPostsHandler(request: FastifyRequest) {
-    const { title, description, user_id } = createPostsSchema.parse(request.body)
+export async function createPostsHandler(request: FastifyRequest, reply: FastifyReply) {
+    const { title, description } = createPostsSchema.parse(request.body)
 
-    const posts = await createPost({ title, description, user_id });
+    const user_id = (request as any).userId
 
-    return ({ postId: posts.id });
+    if (!user_id) {
+        reply.status(401).send({ error: 'User not authenticated.' })
+        return
+    }
+
+    const posts = await createPost({ title, description, user_id })
+
+    return ({ postId: posts.id })
 
 }
