@@ -29,3 +29,17 @@ export async function loginUser(email: string, password: string) {
 
     return { user, passwordMatches };
 }
+
+export async function getUsers() {
+    const users = await prisma.user.findMany({
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            createdAt: true,
+        }
+    })
+
+    return users
+    
+}

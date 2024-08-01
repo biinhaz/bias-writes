@@ -1,14 +1,14 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
-import { createPost } from "../model/posts";
+import { createPost, getPosts } from "../model/posts";
 
-const createPostsSchema = z.object({
+const postsSchema = z.object({
     title: z.string(),
     description: z.string(),
 })
 
 export async function createPostsHandler(request: FastifyRequest, reply: FastifyReply) {
-    const { title, description } = createPostsSchema.parse(request.body)
+    const { title, description } = postsSchema.parse(request.body)
 
     const user_id = (request as any).userId
 
@@ -21,4 +21,12 @@ export async function createPostsHandler(request: FastifyRequest, reply: Fastify
 
     return ({ postId: posts.id })
 
+}
+
+export async function getPostsHandler(request: FastifyRequest) {
+
+    const posts = getPosts()
+
+    return posts;
+    
 }

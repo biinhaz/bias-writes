@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { createUser, loginUser } from "../model/user";
+import { createUser, getUsers, loginUser } from "../model/user";
 import { hash } from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -66,4 +66,11 @@ export async function loginUserHandler(request: FastifyRequest, reply: FastifyRe
         email: user.email,
         token
     })
+}
+
+export async function getUsersHandler() {
+    const users = getUsers()
+
+    return users
+    
 }

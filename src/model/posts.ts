@@ -15,3 +15,16 @@ export async function createPost(data: Omit<Posts, 'id'>) {
     return posts;
 
 }
+
+export async function getPosts() {
+    const posts = await prisma.post.findMany({
+        select: {
+            title: true,
+            description: true,
+            createdAt: true,
+        }
+    })
+
+    return posts
+    
+}
